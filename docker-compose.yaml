@@ -1,0 +1,53 @@
+version: "3.7"
+
+services:
+    traefik:
+        image: traefik:2.1
+        ports:
+            - 80:80
+            - 443:443
+        networks:
+            - dev-net
+        volumes:
+            - ./traefik.yaml:/etc/traefik/traefik.yaml
+            - /var/run/docker.sock:/var/run/docker.sock
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.traefik.rule=Host(`traefik.lvh.me`)
+            - traefik.http.routers.traefik.service=api@internal
+
+    adminer:
+        image: adminer:4
+        networks:
+            - dev-net
+        environment:
+            - ADMINER_DESIGN=nette
+            - ADMINER_PLUGINS=tables-filter
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.adminer.rule=Host(`adminer.lvh.me`)
+
+    postgres:
+        image: postgres:12-alpine
+        # ports:
+        #     - 5432:5432
+        networks:
+            - dev-net
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_DB=postgres
+
+    redis:
+        image: redis:5.0-alpine
+        networks:
+            - dev-net
+
+networks:
+    dev-net:
+        external: true
+
+volumes:
+    postgres-data:

@@ -20,6 +20,7 @@ services:
             - traefik.http.routers.traefik.tls=true
             - traefik.http.middlewares.api-public-prefix.stripprefix.prefixes=/api/public
             - traefik.http.middlewares.api-private-prefix.stripprefix.prefixes=/api/private
+            - traefik.http.middlewares.compress.compress=true
             - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
             - traefik.http.routers.global-redirect.rule=HostRegexp(`{host:.+}`)
             - traefik.http.routers.global-redirect.entrypoints=web

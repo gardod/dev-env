@@ -9,14 +9,21 @@ services:
         networks:
             - dev-net
         volumes:
+            - ./certs/:/certs/
             - ./traefik.yaml:/etc/traefik/traefik.yaml
             - /var/run/docker.sock:/var/run/docker.sock
         labels:
             - traefik.enable=true
             - traefik.http.routers.traefik.rule=Host(`traefik.lvh.me`)
             - traefik.http.routers.traefik.service=api@internal
+            - traefik.http.routers.traefik.entrypoints=websecure
+            - traefik.http.routers.traefik.tls=true
             - traefik.http.middlewares.api-public-prefix.stripprefix.prefixes=/api/public
             - traefik.http.middlewares.api-private-prefix.stripprefix.prefixes=/api/private
+            - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+            - traefik.http.routers.global-redirect.rule=HostRegexp(`{host:.+}`)
+            - traefik.http.routers.global-redirect.entrypoints=web
+            - traefik.http.routers.global-redirect.middlewares=redirect-to-https
 
     adminer:
         image: adminer:4
@@ -28,6 +35,8 @@ services:
         labels:
             - traefik.enable=true
             - traefik.http.routers.adminer.rule=Host(`adminer.lvh.me`)
+            - traefik.http.routers.adminer.entrypoints=websecure
+            - traefik.http.routers.adminer.tls=true
 
     postgres:
         image: postgres:12-alpine

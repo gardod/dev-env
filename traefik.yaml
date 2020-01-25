@@ -1,6 +1,10 @@
+## Static config
+
 providers:
     docker:
         exposedByDefault: false
+    file:
+        filename: /etc/traefik/traefik.yaml
 
 entryPoints:
     web:
@@ -9,3 +13,12 @@ entryPoints:
         address: :443
 
 api: {}
+
+# Dynamic config
+
+tls:
+    stores:
+        default:
+            defaultCertificate:
+                certFile: /certs/lvh.cert
+                keyFile: /certs/lvh.key
